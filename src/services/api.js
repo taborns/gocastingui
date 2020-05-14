@@ -4,6 +4,7 @@
 import ClientSession from "./client-session.js";
  
  let API_BASE_URL = "http://localhost:8000"
+  //let API_BASE_URL = "https://kachapay.net/api/clients"
  //let API_BASE_URL = "https://api.gochereta.com"
  
 
@@ -13,7 +14,7 @@ export default class Api {
 
   static getData(method, param, keepmein) {
 
-    let url = API_BASE_URL +'/' + method + '/'
+    let url = API_BASE_URL +'/' + method + '/' 
     
     if ( keepmein)
       console.log("keepmein", method, param)
@@ -78,6 +79,8 @@ export default class Api {
           }
 
         }
+        
+
 
         axios
           .post(url, data, headers)
@@ -93,6 +96,43 @@ export default class Api {
     }) // promise 
   }
 
+  static updateData(method, data, param=null) {
+    let url = API_BASE_URL + '/' + method + '/'
+
+    if( param)
+      url +=param
+
+    return new Promise( function( resolve, reject) {        
+      ClientSession.getAccessToken( function(isLoggedIn, authData) {
+
+        let headers = {}
+
+        // if user is logged in and the authentication token is found 
+        if ( isLoggedIn && authData != null) {
+          
+          headers = {
+            'headers' : { 
+              Authorization : 'Token ' + authData.token
+            }
+          }
+
+        }
+        
+
+
+        axios
+          .put(url, data, headers)
+          .then( response => {
+            resolve(response.data)
+          })
+          .catch( error => {
+            reject( error.response && Api.formatError( error.response.data ) )
+          })
+      
+      }) // client session 
+      
+    }) // promise 
+  }
 
   static login(data) {
     let url = API_BASE_URL + '/login/'

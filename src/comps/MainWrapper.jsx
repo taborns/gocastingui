@@ -7,6 +7,8 @@ import {
     Route,
   } from "react-router-dom";
 import Login from './Login';
+import Dashboard from './Dashboard';
+import ModelProfile from './ModelProfile';
   
 export default class MainWrapper extends React.Component {
 
@@ -25,6 +27,8 @@ export default class MainWrapper extends React.Component {
                     
 
                     <Route path='/detail/:id/' render={(props) => <ModelDetail {...props} /> } />
+                    <Route path='/profile/' render={(props) => <ModelProfile user={this.props.user} /> } />
+                    <Route path='/settings/' render={props=><Dashboard {...this.props} attributedatas={this.props.attributedatas} user={this.props.user} {...props} />} />
                     <Route path='/search/' render={(props) =>  <ModelListWrapper 
                                                                             {...props} 
                                                                             searchData={this.props.searchData}

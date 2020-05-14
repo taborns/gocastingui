@@ -105,11 +105,11 @@ export default class ModelFilter extends React.Component {
                             </Select>
                         </Form.Item>
 
-                        <Form.Item label='Height Range'>
+                        <Form.Item label='Height Range(M)'>
                             <Slider marks={this.heightMarks} step={0.01} min={1} max={3} onChange={this.handleHeightChange} name='height' value={this.state.height} range defaultValue={[1,3]}  />
                         </Form.Item>
 
-                        <Form.Item label='Weight Range'>
+                        <Form.Item label='Weight Range(KG)'>
                             <Slider marks={this.weightMarks} min={20} max={300} onChange={this.handleWeightChange} name='weight' value={this.state.weight} range defaultValue={[20,300]}  />
                         </Form.Item>
 

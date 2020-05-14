@@ -4,6 +4,7 @@ import Gallery from 'react-grid-gallery';
 import "react-image-gallery/styles/css/image-gallery.css";
 import Api from '../services/api';
 import Loading from './Loading';
+import ReactPlayer from 'react-player';
 
 const { TabPane } = Tabs;
 
@@ -178,21 +179,24 @@ export default class ModelDetail extends React.Component {
                     <TabPane tab="Gallery" key="2">
                     {this.state.cast.user.photos.length > 0 &&
                     <Gallery 
-                        images={this.state.cast.user.photos.map( photo =>( {src : photo.photo, thumbnail : photo.photo, thumbnailHeight: 200,}))} />
+                        images={this.state.cast.user.photos.map( photo =>( {src : `${Api.API_BASE_URL}${photo.photo}`, thumbnail : `${Api.API_BASE_URL}${photo.photo}`, thumbnailHeight: 3,}))} />
                     ||  <div>No photos are uploaded yet.</div>}
                     </TabPane>
                     <TabPane tab="Videos" key="3">
                         <Row gutter={[8, 8]}>
                             
-                                {this.state.cast.user.videos.length > 0 && this.state.cast.user.videos.map( video=> (
-                                    <Col>
-                                        <iframe width="90%" height="405" src={video.video} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                    </Col>
-                                )) || 
-                                <Col>
-                                    <div>No videos are uploaded yet.</div>
-                                </Col>
-                                }
+                        <div className='h3'>Videos ({this.state.cast.user.videos.length})</div>
+                        
+                        {this.state.cast.user.videos.length > 0 && this.state.cast.user.videos.map( video=> (
+                            <Col>
+                                <ReactPlayer playIcon={<Icon style={{fontSize : 72, color:"red"}} theme="filled"  type="play-circle" />} light="https://www.geirangerfjord.no/upload/images/2018_general/film-and-vid.jpg" controls url={video.video} />
+                            </Col>
+                                
+                            )) || 
+                            <Col>
+                                <div>No videos are uploaded yet.</div>
+                            </Col>
+                        }
                             
 
                         </Row>

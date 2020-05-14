@@ -20,14 +20,24 @@ import { Link } from 'react-router-dom';
 
 const menu = (props)=>(
   <Menu>
+
     <Menu.Item key="1">
-      <Link to='/dashboard/'>
-        <Icon className='casting-icon' type="dashboard" /> Dashboard
+      {props.user && props.user.cast && 
+      <Link to='/profile/'>
+        <Icon className='casting-icon' type="user" /> Profile
       </Link>
+      }
 
     </Menu.Item>
 
+    <Menu.Item key="2">
+      <Link to='/settings/'>
+        <Icon className='casting-icon' type="setting" /> Settings
+      </Link>
+    </Menu.Item>
+
     <Menu.Divider/>
+
     <Menu.Item key="1">
       
       <Link onClick={()=>props.logout()}>

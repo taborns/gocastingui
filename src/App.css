@@ -414,3 +414,9 @@ ul.timeline {
 .reveal-adress {
   margin-top: 5px;
 }
+
+@media screen and (max-width: 800px) {
+  .setting-icon-label {
+    display: none;
+  }
+}

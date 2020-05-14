@@ -104,6 +104,7 @@ export default class Root extends React.Component {
         Api.getData('logout')
     }
     componentDidMount() {
+        
         this.getcasts()
         this.getAttributeData() 
         this.getLoggedInUser()
@@ -122,6 +123,7 @@ export default class Root extends React.Component {
                 <MainWrapper 
                     {...this.props} 
                     {...this.state}
+                    getLoggedInUser = {this.getLoggedInUser}
                     setsearchGlobalState={this.setsearchGlobalState}
                     searchCasts={this.searchCasts}
                     paginateSearch={this.paginateSearch}
