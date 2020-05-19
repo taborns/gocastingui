@@ -9,6 +9,8 @@ import {
 import Login from './Login';
 import Dashboard from './Dashboard';
 import ModelProfile from './ModelProfile';
+import JobCreateForm from './JobCreateForm';
+import Jobs from './Jobs';
   
 export default class MainWrapper extends React.Component {
 
@@ -19,9 +21,6 @@ export default class MainWrapper extends React.Component {
     render() {
         return ( 
             <Row className='main-wrapper'>
-                <Col className='wrapper-title'>
-                    <div className='page-title h2'>  Model Porfiles</div>
-                </Col>
                 
                 <Switch>
                     
@@ -29,6 +28,9 @@ export default class MainWrapper extends React.Component {
                     <Route path='/detail/:id/' render={(props) => <ModelDetail {...props} /> } />
                     <Route path='/profile/' render={(props) => <ModelProfile user={this.props.user} /> } />
                     <Route path='/settings/' render={props=><Dashboard {...this.props} attributedatas={this.props.attributedatas} user={this.props.user} {...props} />} />
+                    <Route path='/create-job/' render={props=><JobCreateForm {...this.props} attributedatas={this.props.attributedatas} user={this.props.user} {...props} />} />
+                    <Route path='/jobs/' render={props=><Jobs {...props} user={this.props.user} attributedatas={this.props.attributedatas} {...this.props} />} />
+
                     <Route path='/search/' render={(props) =>  <ModelListWrapper 
                                                                             {...props} 
                                                                             searchData={this.props.searchData}

@@ -27,7 +27,7 @@ export default class ModelFilter extends React.Component {
         }
 
         this.weightMarks = {
-            20 : '0',
+            20 : '20',
             300 : '300'
         }
     }

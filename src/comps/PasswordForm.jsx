@@ -40,9 +40,9 @@ class NormalPasswordChangeForm extends React.Component {
                 this.setState({changed : true, loading : true,  err : null })
                 scroll.scrollToTop()
             } , (err) => {
-                
+                console.log("password Chagne error", err)
 
-                this.setState({ err : err, loading : false, changed : false })
+                this.setState({ err : err[0], loading : false, changed : false })
             })
 
         }
@@ -67,7 +67,7 @@ class NormalPasswordChangeForm extends React.Component {
 
                     <div className='login-area'>
                     
-                        <div className='label h3'>Account Information <Icon className='casting-icon' type="save" /> </div>
+                        <div className='label h3'>Password Information <Icon className='casting-icon' type="save" /> </div>
 
                         
 
@@ -76,7 +76,7 @@ class NormalPasswordChangeForm extends React.Component {
                     
                             <Row>
 
-                                <Col order={2} lg={{ span : 10,}}>
+                                <Col order={2} lg={{ span : this.props.span || 10,}}>
                                     
                                     <p>{ this.state.changed && <div>
                                         <Alert message="Password changed succesfully."
@@ -149,7 +149,7 @@ class NormalPasswordChangeForm extends React.Component {
                                 
                                 </Col>
                             
-                                <Col order={1} lg={{ span : 10, offset : 1}}>
+                                <Col style={{ display : this.props.span && 'none' || 'block'}} order={1} lg={{ span : 10, offset : 1}}>
                                     <img style={{ maxHeight : "300px"}} src='/lock.png' />
                                 </Col>
                             </Row>

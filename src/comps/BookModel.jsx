@@ -7,7 +7,7 @@ import { InboxOutlined } from '@ant-design/icons';
 import * as Scroll from 'react-scroll';
 
 var scroll     = Scroll.animateScroll;
-
+const Option = {Select}
 class NormalBookModel extends React.Component {
    
     constructor(props) {
@@ -160,6 +160,57 @@ class NormalBookModel extends React.Component {
                                     />,
                                     )}
                                 </Form.Item>
+
+                                Comopany
+                                <Form.Item>
+                                    {getFieldDecorator('company', {
+                                    rules: [{ required: true, message: 'Please input your company name!' }],
+                                    })(
+                                    <Input
+                                        prefix={<Icon type="home" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                                        placeholder="company"
+                                    />,
+                                    )}
+                                </Form.Item>
+
+
+                                    Region
+                                    <Form.Item>
+                                        {getFieldDecorator('region', {
+                                        rules: [{ required: true, message: 'Please select your region!' }],
+                                        })(
+                                        <Select 
+                                            showSearch 
+                                            placeholder="Select Region" 
+                                            defaultValue="male" 
+                                            filterOption={(input, option) =>
+                                                option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }>
+
+                                            {(regions || []).map( region => <Option value={region.id}>{region.name}</Option>)}
+                                            
+                                        </Select>,
+                                        )}
+                                    </Form.Item>
+                                    
+                                    City
+                                    <Form.Item>
+                                        {getFieldDecorator('city', {
+                                        rules: [{ required: true, message: 'Please select your city!' }],
+                                        })(
+                                        <Select 
+                                            showSearch 
+                                            placeholder="Select City" 
+                                            defaultValue="male"
+                                            filterOption={(input, option) =>
+                                                option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }>
+                                            {(cities || []).map( city => <Option value={city.id}>{city.name}</Option>)}
+                                            
+                                        </Select>,
+                                        )}
+                                    </Form.Item>
+
                                 
                                 Password
                                     <Form.Item>

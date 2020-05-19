@@ -12,12 +12,10 @@ export default class Api {
   
   static API_BASE_URL = API_BASE_URL;
 
-  static getData(method, param, keepmein) {
+  static getData(method, param, nformaterror) {
 
     let url = API_BASE_URL +'/' + method + '/' 
     
-    if ( keepmein)
-      console.log("keepmein", method, param)
 
     if( param)
       url +=param
@@ -47,7 +45,7 @@ export default class Api {
               })
               .catch(error => {
                 
-                reject( error.response && Api.formatError( error.response.data ) )
+                reject( error.response && ( nformaterror &&  error.response.data || Api.formatError( error.response.data ) ) )
               });
 
           }); // Client Session 
@@ -58,7 +56,47 @@ export default class Api {
   }
 
 
-  static postData(method, data, param=null) {
+  static removeData(method, data, nformaterror) {
+
+    let url = API_BASE_URL +'/' + method + '/' 
+    
+
+  
+        return new Promise(function(resolve, reject) {
+
+          ClientSession.getAccessToken( function(isLoggedIn, authData) {
+
+            let headers = {}
+    
+            // if user is logged in and the authentication token is found 
+            if ( isLoggedIn && authData != null) {
+              
+              headers = {
+                  Authorization : 'Token ' + authData.token
+              }
+    
+            }
+
+            axios
+              .delete(url, { headers : headers, data : data})
+              .then(response => {
+                resolve(response.data);
+                
+              })
+              .catch(error => {
+                
+                reject( error.response && ( nformaterror &&  error.response.data || Api.formatError( error.response.data ) ) )
+              });
+
+          }); // Client Session 
+
+        });//promise
+
+
+  }
+
+
+  static postData(method, data, param=null, nformaterror) {
     let url = API_BASE_URL + '/' + method + '/'
 
     if( param)
@@ -80,15 +118,13 @@ export default class Api {
 
         }
         
-
-
         axios
           .post(url, data, headers)
           .then( response => {
             resolve(response.data)
           })
           .catch( error => {
-            reject( error.response && Api.formatError( error.response.data ) )
+            reject( error.response && ( nformaterror &&  error.response.data || Api.formatError( error.response.data ) ) )
           })
       
       }) // client session 

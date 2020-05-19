@@ -30,7 +30,17 @@ const menu = (props)=>(
 
     </Menu.Item>
 
+    {props.user && props.user.agent && 
+      <Menu.Item key="create-job">
+
+        <Link to='/create-job/'>
+          <Icon className='casting-icon' type="plus" /> Create Job
+        </Link>
+      </Menu.Item>
+      }
+
     <Menu.Item key="2">
+    
       <Link to='/settings/'>
         <Icon className='casting-icon' type="setting" /> Settings
       </Link>
@@ -57,8 +67,8 @@ const Header = (props) => {
 
   return (
     <div>
-      <Navbar className='casting-header' color="dark" light expand="md">
-        <NavbarBrand><Link to='/'><img style={{ height: '50px'}} src='/white.png' /></Link></NavbarBrand>
+      <Navbar className='casting-header' color="dark"  expand="md">
+        <NavbarBrand><Link to='/'><img style={{ height: '50px'}} src='/white.svg' /></Link></NavbarBrand>
         <NavbarToggler onClick={toggle} />
         
         <Collapse isOpen={isOpen} navbar>
@@ -66,9 +76,12 @@ const Header = (props) => {
           {!props.user && 
             (<Nav className="mr-auto" navbar>
               <NavItem>
-                <Link className='header-link' to='/'><Icon className='casting-icon' type="home" /> Home</Link>
+                <Link className='header-link' to='/'><Icon className='casting-icon' type="contacts" /> Casts</Link>
               </NavItem>
               
+            <NavItem>
+              <Link className='header-link' to='/jobs/'><Icon className='casting-icon' type="compass" /> JObs</Link>
+            </NavItem>
               <NavItem>
                 <Link className='header-link' to='/register/'><Icon className='casting-icon' type="user-add" /> Become A Model</Link>
               </NavItem>
@@ -84,8 +97,12 @@ const Header = (props) => {
             </Nav>) 
           || 
           <Nav className="mr-auto" navbar>
+            
             <NavItem>
-              <Link className='header-link' to='/'><Icon className='casting-icon' type="home" /> Home</Link>
+              <Link className='header-link' to='/'><Icon className='casting-icon' type="contacts" /> Casts</Link>
+            </NavItem>
+            <NavItem>
+              <Link className='header-link' to='/jobs/'><Icon className='casting-icon' type="compass" /> JObs</Link>
             </NavItem>
             
 

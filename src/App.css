@@ -49,8 +49,9 @@ body {
 .main-wrapper {
 
     float: none;
-    width: 85% !important;
+    width: 95% !important;
     margin: 0px auto !important;
+    margin-top: 10px !important;
     
   }
 
@@ -260,7 +261,7 @@ ul.timeline {
 
 .timeline li .line-title {
   font-size: 16px;
-  line-height: 6px;
+  line-height: 20px;
 }
 
 .timeline li span {
@@ -420,3 +421,4 @@ ul.timeline {
     display: none;
   }
 }
+

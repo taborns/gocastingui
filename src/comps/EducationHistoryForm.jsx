@@ -1,11 +1,11 @@
 import React from 'react';
-import { Form, Input, Icon, Col, Row, Select, InputNumber, Upload, DatePicker, Alert } from 'antd';
+import { Form,Button, Input, Icon, Col, Row, Select, Modal, InputNumber, Upload, DatePicker, Alert } from 'antd';
 import Api from '../services/api';
-import { Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { InboxOutlined } from '@ant-design/icons';
 import * as Scroll from 'react-scroll';
 
+const {confirm} = Modal
 let moment = require('moment')
 const { Dragger } = Upload;
 var scroll     = Scroll.animateScroll;
@@ -16,9 +16,10 @@ class NormalEducationHistory extends React.Component {
         super(props)
         this.state = {
             loading : false,
-            created : true, 
-            loading : true,  
-            err : null
+            created : false, 
+            loading : false,  
+            err : null,
+            removingEducationHistory : null,
         }
     }
 
@@ -29,7 +30,7 @@ class NormalEducationHistory extends React.Component {
             if (!err) {
                 Api.postData(`cast.educations`, values)
                 .then( (response)=>{ 
-                    this.setState({created : true, loading : true,  err : null })
+                    this.setState({created : true, loading : false,  err : null })
                     scroll.scrollToTop()
                     this.props.getLoggedInUser()
                 } , (respo) => this.setState({ err : respo, loading : false, created : false }) )
@@ -37,6 +38,36 @@ class NormalEducationHistory extends React.Component {
             }
 
         });
+    }
+
+    remove = educationHistoryID => {
+        console.log("removing ID", this.state.removing)
+        Api.removeData(`cast.educations.remove/${educationHistoryID}`)
+            .then( response => {
+                scroll.scrollToTop()
+                this.props.getLoggedInUser()
+                this.setState({ removingEducationHistory : null})
+
+            }, err => {
+                Modal.error({
+                    title : "Failed to remove work history"
+                })
+                this.setState({ removingEducationHistory : null})
+            })
+    }
+
+    showConfirm = educationHistoryID => {
+        confirm({
+            content: "Are you sure you want to remove your work historoy?",
+            onOk : () => {
+              this.setState({ removingEducationHistory : educationHistoryID})
+              this.remove(educationHistoryID);
+            },
+            onCancel: () => {
+              console.log('Cancel');
+            },
+          });
+
     }
 
     render() {
@@ -66,7 +97,23 @@ class NormalEducationHistory extends React.Component {
 
                                 {/* First Column */}
                                 <Col lg={{ span : 10}}>
-                                Title
+                                    
+                                    <p>{ this.state.created && <div>
+                                        <Alert message="Education History Succesfully Added."
+                                            type="success"
+                                            
+                                            showIcon
+                                    /></div> || 
+                                    
+                                    this.state.err && <div>
+                                        <Alert message={this.state.err}
+                                            type="error"
+                                            
+                                            showIcon
+                                        /></div>}
+                                    </p>
+
+                                Education Title
                                 <Form.Item>
                                     {getFieldDecorator('title', {
                                     rules: [{ required: true, message: 'Please input your Education title!' }],
@@ -97,7 +144,7 @@ class NormalEducationHistory extends React.Component {
 
                                     rules: [{ required: true, message: 'Please input the year you started the education!' }],
                                     })(
-                                    <Input
+                                    <InputNumber
                                         prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
                                         placeholder="Start Year"
                                     />,
@@ -108,9 +155,8 @@ class NormalEducationHistory extends React.Component {
                                 <Form.Item>
                                     {getFieldDecorator('end_year', {
 
-                                    rules: [{ required: true, message: 'Please input the year you finished the education!' }],
                                     })(
-                                    <Input
+                                    <InputNumber
                                         prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
                                         placeholder="End Year"
                                     />,
@@ -146,10 +192,19 @@ class NormalEducationHistory extends React.Component {
                                             <li> <Icon type="bank" theme="filled" className='casting-icon' /> <h2 class="timeline-title">Education History</h2></li>
                                             
                                             {this.props.user.education_histories.length > 0 && this.props.user.education_histories.map( education_history => (
-                                            <li><h3 class="line-title">{education_history.title} - {education_history.school}</h3>
-
+                                            <li>
+                                                <div>
+                                                    <h3 class="line-title">{education_history.title} - {education_history.school}</h3>
+                                                </div>
                                                 <span>{education_history.start_year} - {education_history.end_year ||  'Present'}</span>
                                                 {education_history.description && <p class="little-text">{education_history.description}</p>}
+                                                <div>
+                                                    <Button size="large" disabled={this.state.removingEducationHistory == education_history.id} onClick={() => this.showConfirm(education_history.id)} type="danger">
+                                                        {this.state.removingEducationHistory == education_history.id && 'Removing' ||  <span><Icon type="delete" className='casting-icon' /> REMOVE</span>  }
+                                                    </Button>
+
+                                                </div>
+
 
                                             </li>
                                             )) || <li>No education histories found.</li> }

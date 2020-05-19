@@ -40,22 +40,51 @@ class NormalRegister extends React.Component {
 
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-        values['profile_picture'] = this.getUpload( values['profile_picture'] )
-        values['birth_date'] = values['birth_date'].format("YYYY-MM-DD")
+        
+        scroll.scrollToTop()
 
         values = this.composeRegisterData( values )
 
         if (!err) {
-            Api.postData('cast.register', values)
+            values['profile_picture'] = this.getUpload( values['profile_picture'] )
+            values['birth_date'] = values['birth_date'].format("YYYY-MM-DD")
+    
+            Api.postData('cast.register', values, null, true)
             .then( (response)=>{ 
                 this.setState({registered : true, loading : true,  err : null })
                 scroll.scrollToTop()
-            } , (respo) => this.setState({ error : respo, loading : false, registered : false }) )
+            } , (respo) => this.setState({ error : this.composeError(respo), loading : false, registered : false }) )
 
         }
+        else {
+            this.setState({ error : "Please fill in all required fields.",  registered : false })
+        }
+
         });
     };
 
+    composeError = (error) => {
+
+        if ( error.user)
+            return Api.formatError(error.user)
+        
+        if ( error.gender)
+            return Api.formatError(error.gender)
+
+        if ( error.additional_skills)
+            return Api.formatError(error.additional_skills)
+
+
+        if ( error.intersted_in)
+            return Api.formatError(error.intersted_in)
+        
+        if ( error.languages)
+            return Api.formatError(error.languages)
+
+        return Api.formatError(error)
+        
+        
+    }
     composeRegisterData = values => {
         let user = {}
         
@@ -122,6 +151,10 @@ class NormalRegister extends React.Component {
                             <Alert message="You have created account successefuly."
                                 description="Please login to your account using the credentials you provided."
                                 type="success"
+                                showIcon
+                            /></div> || this.state.error && <div>
+                            <Alert message={this.state.error}                                
+                                type="error"
                                 showIcon
                             /></div>}
 
@@ -216,7 +249,6 @@ class NormalRegister extends React.Component {
                                 Facebook
                                 <Form.Item>
                                     {getFieldDecorator('facebook', {
-                                    rules: [{ required: true, message: 'Please input your mobile number!' }],
                                     })(
                                     <Input
                                         prefix={<Icon type="facebook" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -228,7 +260,6 @@ class NormalRegister extends React.Component {
                                 Instagram
                                 <Form.Item>
                                     {getFieldDecorator('instagram', {
-                                    rules: [{ required: true, message: 'Please input your mobile number!' }],
                                     })(
                                     <Input
                                         prefix={<Icon type="instagram" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -240,7 +271,6 @@ class NormalRegister extends React.Component {
                                 Twitter
                                 <Form.Item>
                                     {getFieldDecorator('twitter', {
-                                    rules: [{ required: true, message: 'Please input your mobile number!' }],
                                     })(
                                     <Input
                                         prefix={<Icon type="twitter" style={{ color: 'rgba(0,0,0,.25)' }} />}

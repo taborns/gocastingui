@@ -1,7 +1,6 @@
 import React from 'react';
-import { Form, Input, Icon, Col, Row, Select, InputNumber, Upload, DatePicker, Alert } from 'antd';
+import { Form, Modal, Input, Icon,Button, Col, Row, Select, InputNumber, Upload, DatePicker, Alert } from 'antd';
 import Api from '../services/api';
-import { Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { InboxOutlined } from '@ant-design/icons';
 import * as Scroll from 'react-scroll';
@@ -11,6 +10,7 @@ import ReactPlayer from 'react-player';
 
 let moment = require('moment')
 const { Dragger } = Upload;
+const { confirm } = Modal;
 var scroll     = Scroll.animateScroll;
 const { Option } = Select;
 
@@ -20,9 +20,9 @@ class NormalVideoGallery extends React.Component {
         this.state = {
             loading : false,
             created : true, 
-            loading : true,  
             err : null,
-            photo : null
+            photo : null,
+            removingVideo : null
         }
     }
 
@@ -42,6 +42,36 @@ class NormalVideoGallery extends React.Component {
         }
         });
     };
+
+    remove = videoID => {
+        console.log("removing ID", this.state.removing)
+        Api.removeData(`cast.video.remove/${videoID}`)
+            .then( response => {
+                scroll.scrollToTop()
+                this.props.getLoggedInUser()
+                this.setState({ removingVideo : null})
+
+            }, err => {
+                Modal.error({
+                    title : "Failed to remove the video"
+                })
+                this.setState({ removingVideo : null})
+            })
+    }
+
+    showConfirm = videoID => {
+        confirm({
+            content: "Are you sure you want to remove this video?",
+            onOk : () => {
+              this.setState({ removingVideo : videoID})
+              this.remove(videoID);
+            },
+            onCancel: () => {
+              console.log('Cancel');
+            },
+          });
+
+    }
 
     render() {
         const { getFieldDecorator } = this.props.form;
@@ -77,7 +107,7 @@ class NormalVideoGallery extends React.Component {
                                     <Form.Item>
                                         {getFieldDecorator('video', {
                                         
-                                        rules: [{ required: true, message: 'Please input your mobile number!' }],
+                                        rules: [{ required: true, message: 'Please input Link to your!' }],
                                         })(
                                         <Input
                                             prefix={<Icon type="youtube" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -103,9 +133,15 @@ class NormalVideoGallery extends React.Component {
                                     <div >
                                     <div className='h3'>Your Videos</div>
                                     {this.props.user && this.props.user.videos.length > 0 &&
-                                       this.props.user.videos.map(video => <div style={{marginBottom : '5px'}}>
-                                             <ReactPlayer playIcon={<Icon style={{fontSize : 72, color:"red"}} theme="filled"  type="play-circle" />} light="https://www.geirangerfjord.no/upload/images/2018_general/film-and-vid.jpg" controls url={video.video} />
-                                           </div>) ||  <div>No videos uploaded yet.</div>}
+                                       this.props.user.videos.map(video => 
+                                       <div style={{marginBottom : '5px'}}>
+                                            <ReactPlayer 
+                                                playIcon={<Icon style={{fontSize : 72, color:"red"}} 
+                                                theme="filled"  type="play-circle" />} 
+                                                light="https://www.geirangerfjord.no/upload/images/2018_general/film-and-vid.jpg" 
+                                                controls url={video.video} />
+                                                <Button loading={this.state.removingVideo == video.id} onClick={() => this.showConfirm(video.id)} size='large' type='danger'><Icon className='casting-icon' type="delete" /> Remove</Button>
+                                        </div>) ||  <div>No videos uploaded yet.</div>}
 
                                     </div>
                                 </Col>

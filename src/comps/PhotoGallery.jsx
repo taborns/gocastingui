@@ -1,13 +1,13 @@
 import React from 'react';
-import { Form, Input, Icon, Col, Row, Select, InputNumber, Upload, DatePicker, Alert } from 'antd';
+import { Form, Modal, Input, Icon, Button, Col, Row, Select, InputNumber, Upload, DatePicker, Alert } from 'antd';
 import Api from '../services/api';
-import { Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { InboxOutlined } from '@ant-design/icons';
 import * as Scroll from 'react-scroll';
 import "react-image-gallery/styles/css/image-gallery.css";
 import Gallery from 'react-grid-gallery';
 
+const {confirm} = Modal
 let moment = require('moment')
 const { Dragger } = Upload;
 var scroll     = Scroll.animateScroll;
@@ -16,13 +16,41 @@ const { Option } = Select;
 class NormalPhotoGallery extends React.Component {
     constructor(props) {
         super(props)
+        console.log("this.props", props)
         this.state = {
             loading : false,
             created : true, 
             loading : true,  
             err : null,
-            photo : null
+            photo : null,
+            images : this.setImages(this.props.user.photos),
+            selectedImages : [],
+            removeLoading : false,
         }
+
+    }
+    setImages = (photos) => photos.map( photo =>( { id : photo.id, src : `${Api.API_BASE_URL}${photo.photo}`, thumbnail : `${Api.API_BASE_URL}${photo.photo}`, thumbnailHeight : 3,}))
+
+    onSelectImage = (index, image) => {
+        var img = image
+        let selectedImages = this.state.selectedImages.slice()
+
+        if(img.hasOwnProperty("isSelected")) 
+            img.isSelected = !img.isSelected;
+        else 
+            img.isSelected = true;
+        
+        if ( img.isSelected) 
+            selectedImages.push( img.id )
+        
+        else if ( selectedImages.indexOf(img.id)!=-1 ) {
+            let img_ind = selectedImages.indexOf(img.id)
+            selectedImages = selectedImages.slice( 0, img_ind).concat( selectedImages.slice( img_ind+1) )
+        }
+        console.log("Selected Images", this.state.selectedImages && this.state.selectedImages.length)
+        this.setState({
+            selectedImages : selectedImages,
+        });
     }
 
     handleUpload = info => {
@@ -34,20 +62,43 @@ class NormalPhotoGallery extends React.Component {
         Api.postData('cast.gallery', formData)
             .then( response => {
                 this.setState({ photo : null})
-                this.props.getLoggedInUser()
+                this.props.getLoggedInUser( (user) => user &&this.setState({ images : this.setImages(user.photos) }))
             })
 
     }
     
+    showConfirm = educationHistoryID => {
+        confirm({
+            content: `Are you sure you want to delete ${this.state.selectedImages.length} images from your gallery?`,
+            onOk : () => {
+              this.handleRemove();
+            },
+            onCancel: () => {
+              console.log('Cancel');
+            },
+          });
+
+    }
+    handleRemove = e => {
+        this.setState({ removeLoading : true})
+        Api.removeData('cast.gallery.remove', {'photos' : this.state.selectedImages})
+            .then( response => {
+                this.setState({ selectedImages : [], removeLoading : false})
+                this.props.getLoggedInUser( (user) => user &&this.setState({ images : this.setImages(user.photos) }))
+            } , err => this.setState({removeLoading : false}))
+    }
+
     beforeUpload = photo => {
         this.setState({photo})
         return false;
       }
 
+    componentDidMount() {
+
+    }
     render() {
         const { getFieldDecorator } = this.props.form;
-        const user = this.props.user
-        const profile_picture = this.state.picture || user.cast.profile_picture
+        let images_selected = !this.state.selectedImages || this.state.selectedImages && this.state.selectedImages.length == 0
         
         
         return (
@@ -107,12 +158,12 @@ class NormalPhotoGallery extends React.Component {
 
                                 <Col lg={{ span : 24,}}>
                                 
-                                    {console.log("photogallerylist", this.props.user.photos )}
                                     <div >
-                                    <div className='h3'>Your Photos</div>
+                                    <div className='h3'>Your Photos <Button onClick={this.showConfirm} loading={this.state.removeLoading} disabled={images_selected} type="danger"><Icon type='delete' className='casting-icon' /> Remove ({  this.state.selectedImages.length} images)</Button> </div>
                                     {this.props.user && this.props.user.photos.length > 0 &&
                                     <Gallery 
-                                    images={this.props.user.photos.map( photo =>( {src : `${Api.API_BASE_URL}${photo.photo}`, thumbnail : `${Api.API_BASE_URL}${photo.photo}`, thumbnailHeight : 3,}))} />
+                                    onSelectImage={this.onSelectImage}
+                                    images = {this.state.images} />
                                 ||  <div>No photos are uploaded yet.</div>}
 
                                     </div>

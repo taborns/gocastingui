@@ -23,11 +23,14 @@ export default class DashboardAgent extends React.Component {
         
         return (<Row gutter={16} >
 
-                    <Col style={{ marginTop : '10px'}} xs={{ span : 22, push : 1}} > 
+                    <Col style={{ marginTop : '10px'}} xs={{ span : 11,}} > 
                         
                     {this.props.user  && <BasicInfoAgentForm {...this.props} attributedatas={this.props.attributedatas} user={this.props.user}/> }
+                    </Col>
 
-                    
+                    <Col style={{ marginTop : '10px'}} xs={{ span : 11,}} > 
+                    {this.props.user && <PasswordForm span={24} attributedatas={this.props.attributedatas} user={this.props.user}/> }
+
                     </Col>
                 </Row>);
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Icon, Col, Row } from 'antd';
+import { Form, Input, Icon, Col, Row, Alert } from 'antd';
 import Api from '../services/api';
 import { Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
@@ -29,7 +29,7 @@ class LoginPage extends React.Component {
             this.props.getLoggedInUser()
             this.props.history.push('/')
             this.setState({suc : 'You have succefully logged in.', loading : true,  err : null })
-          } , (respo) => this.setState({ error : respo, loading : false, suc : null }) )
+          } , (respo) => this.setState({ error : "Invalid username/password.", loading : false, suc : null }) )
 
       }
     });
@@ -55,7 +55,11 @@ class LoginPage extends React.Component {
                     <div className='login-area'>
                     <div className='label h3'>Login <Icon className='casting-icon' type="user" /> </div>
                     <div className='login-reg-note'>New member? Please <Link style={{fontWeight : "bolder"}} to='/register'>Create an Account</Link></div>
-                    
+                    {this.state.error && <div>
+                            <Alert message={this.state.error}                                
+                                type="error"
+                                showIcon
+                            /></div>}
                     <Form onSubmit={this.handleSubmit} className="login-form">
                     
                         <Form.Item>

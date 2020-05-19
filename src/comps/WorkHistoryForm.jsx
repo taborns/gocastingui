@@ -1,10 +1,11 @@
 import React from 'react';
-import { Form, Input, Icon, Col, Row, Select, InputNumber, Upload, DatePicker, Alert } from 'antd';
+import { Form, Input, Icon, Button, Modal, Col, Row, Select, InputNumber, Upload, DatePicker, Alert } from 'antd';
 import Api from '../services/api';
-import { Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { InboxOutlined } from '@ant-design/icons';
 import * as Scroll from 'react-scroll';
+
+const { confirm } = Modal;
 
 let moment = require('moment')
 const { Dragger } = Upload;
@@ -16,8 +17,9 @@ class NormalWorkHistory extends React.Component {
         super(props)
         this.state = {
             loading : false,
-            registered : false,
-            err : null
+            created : false,
+            err : null,
+            removingWorkHistory : null,
         }
     }
 
@@ -28,14 +30,44 @@ class NormalWorkHistory extends React.Component {
             if (!err) {
                 Api.postData(`cast.workhistory`, values)
                 .then( (response)=>{ 
-                    this.setState({registered : true, loading : true,  err : null })
+                    this.setState({created : true, loading : false,  err : null })
                     scroll.scrollToTop()
                     this.props.getLoggedInUser()
-                } , (respo) => this.setState({ err : respo, loading : false, registered : false }) )
+                } , (respo) => this.setState({ err : respo, loading : false, created : false }) )
 
             }
 
         });
+    }
+
+    remove = workHistorID => {
+        console.log("removing ID", this.state.removing)
+        Api.removeData(`cast.workhistory.remove/${workHistorID}`)
+            .then( response => {
+                scroll.scrollToTop()
+                this.props.getLoggedInUser()
+                this.setState({ removingWorkHistory : null})
+
+            }, err => {
+                Modal.error({
+                    title : "Failed to remove work history"
+                })
+                this.setState({ removingWorkHistory : null})
+            })
+    }
+
+    showConfirm = workHistorID => {
+        confirm({
+            content: "Are you sure you want to remove your work historoy?",
+            onOk : () => {
+              this.setState({ removingWorkHistory : workHistorID})
+              this.remove(workHistorID);
+            },
+            onCancel: () => {
+              console.log('Cancel');
+            },
+          });
+
     }
 
     render() {
@@ -56,7 +88,7 @@ class NormalWorkHistory extends React.Component {
                     
                         <div className='label h3'>Working History <Icon className='casting-icon' type="save" /> </div>
                         
-                        
+                       
 
 
                         <Form  className="login-form">
@@ -65,6 +97,20 @@ class NormalWorkHistory extends React.Component {
 
                                 {/* First Column */}
                                 <Col lg={{ span : 10}}>
+                                <p>{ this.state.created && <div>
+                                        <Alert message="Work History Succesfully Added."
+                                            type="success"
+                                            closable
+                                            showIcon
+                                    /></div> || 
+                                    
+                                    this.state.err && <div>
+                                        <Alert message={this.state.err}
+                                            type="error"
+                                            closable
+                                            showIcon
+                                        /></div>}
+                                    </p>
                                 Title
                                 <Form.Item>
                                     {getFieldDecorator('title', {
@@ -96,7 +142,7 @@ class NormalWorkHistory extends React.Component {
 
                                     rules: [{ required: true, message: 'Please input the year you started the education!' }],
                                     })(
-                                    <Input
+                                    <InputNumber
                                         prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
                                         placeholder="Start Year"
                                     />,
@@ -107,9 +153,8 @@ class NormalWorkHistory extends React.Component {
                                 <Form.Item>
                                     {getFieldDecorator('end_year', {
 
-                                    rules: [{ required: true, message: 'Please input the year you finished the education!' }],
                                     })(
-                                    <Input
+                                    <InputNumber
                                         prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
                                         placeholder="End Year"
                                     />,
@@ -149,6 +194,12 @@ class NormalWorkHistory extends React.Component {
 
                                                 <span>{working_history.start_year} - {working_history.end_year ||  'Present'}</span>
                                                 {working_history.description && <p class="little-text">{working_history.description}</p>}
+                                                <div>
+                                                    <Button size="large" disabled={this.state.removingWorkHistory == working_history.id} onClick={() => this.showConfirm(working_history.id)} type="danger">
+                                                        {this.state.removingWorkHistory == working_history.id && 'Removing' ||  <span><Icon type="delete" className='casting-icon' /> REMOVE</span>  }
+                                                    </Button>
+
+                                                </div>
 
                                             </li>
                                             )) || <li>No Working histories found.</li> }

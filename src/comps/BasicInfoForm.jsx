@@ -40,22 +40,55 @@ class NormalBasicInfo extends React.Component {
         this.setState({loading : true})
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-        console.log("error-values", values)
+        console.log("error values", err, values['profile_picture'])
+        scroll.scrollToTop()
         values['profile_picture'] = this.getUpload( values['profile_picture'] )
         values['birth_date'] = values['birth_date'].format("YYYY-MM-DD")
 
         values = this.composeRegisterData( values )
         if (!err) {
-            Api.updateData(`cast.update`, values)
+
+            console.log("error values d", err, values)
+
+    
+            Api.updateData(`cast.update`, values, null, true)
             .then( (response)=>{ 
                 this.setState({registered : true, loading : true,  err : null })
                 scroll.scrollToTop()
                 this.props.getLoggedInUser()
-            } , (respo) => this.setState({ error : respo, loading : false, registered : false }) )
+            } , (respo) => this.setState({ error : this.composeError(respo), loading : false, registered : false }) )
 
         }
+
+        else {
+            this.setState({ error : "Please fill in all required fields.",  registered : false })
+        }
+
         });
     };
+
+    composeError = (error) => {
+
+        if ( error.user)
+            return Api.formatError(error.user)
+        
+        if ( error.gender)
+            return Api.formatError(error.gender)
+
+        if ( error.additional_skills)
+            return Api.formatError(error.additional_skills)
+
+
+        if ( error.intersted_in)
+            return Api.formatError(error.intersted_in)
+        
+        if ( error.languages)
+            return Api.formatError(error.languages)
+
+        return Api.formatError(error)
+        
+        
+    }
 
     composeRegisterData = values => {
         let user = {}
@@ -68,6 +101,8 @@ class NormalBasicInfo extends React.Component {
         }
 
         user['cast'] = values
+        console.log("Composing data == ", user)
+
         return user 
     }
 
@@ -120,9 +155,12 @@ class NormalBasicInfo extends React.Component {
                         <div className='label h3'>Account Information <Icon className='casting-icon' type="save" /> </div>
                         
                         { this.state.registered && <div>
-                            <Alert message="You have created account successefuly."
-                                description="Please login to your account using the credentials you provided."
+                            <Alert message="You have updated your account successefuly."
                                 type="success"
+                                showIcon
+                            /></div>|| this.state.error && <div>
+                            <Alert message={this.state.error}                                
+                                type="error"
                                 showIcon
                             /></div>}
 
@@ -232,7 +270,6 @@ class NormalBasicInfo extends React.Component {
                                     {getFieldDecorator('facebook', {
                                     initialValue : this.props.user.cast.facebook,
                                     
-                                    rules: [{ required: true, message: 'Please input your mobile number!' }],
                                     })(
                                     <Input
                                         prefix={<Icon type="facebook" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -246,7 +283,6 @@ class NormalBasicInfo extends React.Component {
                                     {getFieldDecorator('instagram', {
                                     initialValue : this.props.user.cast.instagram,
 
-                                    rules: [{ required: true, message: 'Please input your mobile number!' }],
                                     })(
                                     <Input
                                         prefix={<Icon type="instagram" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -260,7 +296,6 @@ class NormalBasicInfo extends React.Component {
                                     {getFieldDecorator('twitter', {
                                     initialValue : this.props.user.cast.twitter,
                                     
-                                    rules: [{ required: true, message: 'Please input your mobile number!' }],
                                     })(
                                     <Input
                                         prefix={<Icon type="twitter" style={{ color: 'rgba(0,0,0,.25)' }} />}

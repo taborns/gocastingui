@@ -8,6 +8,7 @@ import Login from './Login';
 import Register from './Register';
 import ClientSession from '../services/client-session';
 import BooKModel from './BookModel';
+import Jobs from './Jobs';
 var scroll     = Scroll.animateScroll;
 
 export default class Root extends React.Component {
@@ -15,6 +16,12 @@ export default class Root extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            jobs : [],
+            jobs_count : [],
+            jobs_loading : true,
+            jobs_current : 1,
+
+
             casts : [],
             casts_count : [],
             casts_loading : true,
@@ -46,9 +53,13 @@ export default class Root extends React.Component {
             .then( attributedatas => this.setState({attributedatas}))
     }
 
-    getLoggedInUser = () => {
+    getLoggedInUser = (callback) => {
         Api.getData('user.info')
-            .then( user => this.setState({ user }))
+            .then( user =>{ 
+                
+                callback && callback(user)
+                this.setState({ user })
+            })
     }
 
     setsearchGlobalState = (name, value) => {
@@ -69,9 +80,27 @@ export default class Root extends React.Component {
         this.paginateScroll()
     }
 
+    jobPaginate = (page) => {
+        this.getjobs(page)
+        this.paginateScroll()
+    }
+
     paginateSearch = (page) => {
         this.searchCasts(page)
         this.paginateScroll()
+    }
+
+    getjobs = (page) => {
+        if( !page)
+            page = 1
+        
+        this.setState({ jobs_loading : true})
+
+        Api.getData('jobs', `?page=${page}`)
+        .then( 
+            response => this.setState({ jobs : response.results, jobs_count : response.count, jobs_loading : false, jobs_current : page }), 
+            err => this.setState({ jobs_loading : false})
+        )
     }
 
     getcasts = (page) => {
@@ -104,7 +133,7 @@ export default class Root extends React.Component {
         Api.getData('logout')
     }
     componentDidMount() {
-        
+        this.getjobs()
         this.getcasts()
         this.getAttributeData() 
         this.getLoggedInUser()

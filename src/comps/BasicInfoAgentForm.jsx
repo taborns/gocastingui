@@ -40,22 +40,31 @@ class NormalBasicInfoAgent extends React.Component {
         this.setState({loading : true})
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-        console.log("error-values", values)
-        values['profile_picture'] = this.getUpload( values['profile_picture'] )
-        values['birth_date'] = values['birth_date'].format("YYYY-MM-DD")
+
 
         values = this.composeRegisterData( values )
         if (!err) {
-            Api.updateData(`cast.update`, values)
+            Api.updateData(`agent.update`, values, null, true)
             .then( (response)=>{ 
                 this.setState({registered : true, loading : true,  err : null })
                 scroll.scrollToTop()
                 this.props.getLoggedInUser()
-            } , (respo) => this.setState({ error : respo, loading : false, registered : false }) )
+            } , (respo) => this.setState({ error : this.composeError(respo), loading : false, registered : false }) )
 
         }
         });
     };
+
+    composeError = (error) => {
+
+        if ( error.agent)
+            return Api.formatError(error.agent)
+        
+
+        return Api.formatError(error)
+        
+        
+    }
 
     composeRegisterData = values => {
         let user = {}
@@ -67,7 +76,7 @@ class NormalBasicInfoAgent extends React.Component {
         
         }
 
-        user['cast'] = values
+        user['agent'] = values
         return user 
     }
 
@@ -103,6 +112,7 @@ class NormalBasicInfoAgent extends React.Component {
 
     render() {
         const { getFieldDecorator } = this.props.form;
+        const {languages, disciplines, regions, cities, additional_skills} = this.props.attributedatas || {}
         
         return (
         <Row >
@@ -116,12 +126,7 @@ class NormalBasicInfoAgent extends React.Component {
                     
                         <div className='label h3'>Account Information <Icon className='casting-icon' type="save" /> </div>
                         
-                        { this.state.registered && <div>
-                            <Alert message="You have created account successefuly."
-                                description="Please login to your account using the credentials you provided."
-                                type="success"
-                                showIcon
-                            /></div>}
+                        
 
 
                         <Form  className="login-form">
@@ -130,6 +135,17 @@ class NormalBasicInfoAgent extends React.Component {
 
                                 {/* First Column */}
                                 <Col lg={{ span : 20}}>
+                                { this.state.registered && <div>
+                                <Alert message="You have created account successefuly."
+                                    description="Please login to your account using the credentials you provided."
+                                    type="success"
+                                    showIcon
+                                /></div> || this.state.error && <div>
+                                <Alert message={this.state.error}
+                                    type="error"
+                                    showIcon
+                                /></div> }
+                                
                                 Username
                                 <Form.Item>
                                     {getFieldDecorator('username', {
@@ -201,17 +217,63 @@ class NormalBasicInfoAgent extends React.Component {
                                     )}
                                 </Form.Item>
 
-                                
-                                </Col>
+                                Comopany
+                                <Form.Item>
+                                    {getFieldDecorator('company', {
+                                    initialValue : this.props.user.agent.company,
+                                    
+                                    rules: [{ required: true, message: 'Please input your company name!' }],
+                                    })(
+                                    <Input
+                                        prefix={<Icon type="home" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                                        placeholder="company"
+                                    />,
+                                    )}
+                                </Form.Item>
 
-                                {/* Second Column */}
 
-
-                            </Row>
-
-                            <Row>
-                                <Col lg={{span : 24}}>
+                                    Region
+                                    <Form.Item>
+                                        {getFieldDecorator('region', {
+                                        initialValue : this.props.user.agent.region.id,
                                         
+                                        rules: [{ required: true, message: 'Please select your region!' }],
+                                        })(
+                                        <Select 
+                                            showSearch 
+                                            placeholder="Select Region" 
+                                            defaultValue="male" 
+                                            filterOption={(input, option) =>
+                                                option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }>
+
+                                            {(regions || []).map( region => <Option value={region.id}>{region.name}</Option>)}
+                                            
+                                        </Select>,
+                                        )}
+                                    </Form.Item>
+                                    
+                                    City
+                                    <Form.Item>
+                                        {getFieldDecorator('city', {
+                                        initialValue : this.props.user.agent.city.id,
+                                        
+                                        rules: [{ required: true, message: 'Please select your city!' }],
+                                        })(
+                                        <Select 
+                                            showSearch 
+                                            placeholder="Select City" 
+                                            defaultValue="male"
+                                            filterOption={(input, option) =>
+                                                option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                            }>
+                                            {(cities || []).map( city => <Option value={city.id}>{city.name}</Option>)}
+                                            
+                                        </Select>,
+                                        )}
+                                    </Form.Item>
+
+
                                     <Form.Item>
                                         
                                         <Button onClick={this.handleSubmit} size='large' block  loading={this.state.loading} type="primary" htmlType="submit" className="login-form-button">

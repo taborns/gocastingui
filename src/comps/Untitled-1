@@ -1,0 +1,15 @@
+curl 'http://localhost:8000/cast.register/' \
+  -H 'Connection: keep-alive' \
+  -H 'Pragma: no-cache' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36' \
+  -H 'Content-Type: application/json;charset=UTF-8' \
+  -H 'Origin: http://localhost:3000' \
+  -H 'Sec-Fetch-Site: same-site' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Referer: http://localhost:3000/register/' \
+  -H 'Accept-Language: en-GB,en;q=0.9,am;q=0.8' \
+  --data-binary '{"username":"taborns2","first_name":"","last_name":"","gender":"female","birth_date":"2020-05-03","email":"shiferawtabor@gmail.com","phone":"0923427836","region":1,"city":1,"height":1.9,"weight":120,"languages":[1,2],"intersted_in":[12],"additional_skills":[2],"profile_picture":"profiles/2020-05-17_01.21.58.jpg","password":"123","user":{"username":"taborns2","first_name":"Tabor3","last_name":"Shfieraw","email":"shiferawtabor@gmail.com","password":"123"}}' \
+  --compressed
