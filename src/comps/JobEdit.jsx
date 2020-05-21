@@ -1,20 +1,17 @@
 import React from 'react';
-import { Form, Input, Icon, Col, Row, Select, InputNumber, Upload, DatePicker, Alert } from 'antd';
+import { Form, Input, Button, Card, Empty, Icon, Col, Row, Select, InputNumber, Upload, DatePicker, Alert, PageHeader } from 'antd';
 import Api from '../services/api';
-import { Button } from 'reactstrap';
-import { Link } from 'react-router-dom';
-import { InboxOutlined } from '@ant-design/icons';
 import * as Scroll from 'react-scroll';
-import TextArea from 'antd/lib/input/TextArea';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { Link } from 'react-router-dom';
 
 let moment = require('moment')
 const { Dragger } = Upload;
 var scroll     = Scroll.animateScroll;
 const { Option } = Select;
 
-class NormalJobCreate extends React.Component {
+class JobEditForm extends React.Component {
    
     constructor(props) {
     
@@ -22,15 +19,30 @@ class NormalJobCreate extends React.Component {
     
         this.state = {
             error : '',
+            loading_job : false,
             loading : false,
             registered : false,
             requirement : "",
-            closes_on : null
+            closes_on : null,
+            job : null
         }
 
     }
     
+    getJob = () => {
+
+        this.setState({loading_job : true})
+
+        Api.getData(`jobs/${this.props.match.params.id}`)
+            .then( 
+                job => this.setState({ job, closes_on : moment(job.closes_on).format('YYYY-MM-DD'), requirement : job.requirement, loading_job : false }),
+                err => this.setState({loading_job : false})
+                )
+    }
+
+
     dateChange = (date, dateString) => this.setState({closes_on : dateString})
+    
     handleSubmit = e => {
 
         this.setState({loading : true})
@@ -40,10 +52,11 @@ class NormalJobCreate extends React.Component {
 
         values = this.composeRegisterData( values )
         if (!err) {
-            Api.postData(`job.create`, values, null, true)
+            Api.updateData(`job.update/${this.props.match.params.id}`, values, null, true)
             .then( (response)=>{ 
-                this.setState({registered : true, loading : true,  err : null })
+                this.setState({registered : true, loading : false,  err : null })
                 scroll.scrollToTop()
+                this.props.getLoggedInUser()
             } , (respo) => this.setState({ error : this.composeError(respo), loading : false, registered : false }) )
 
         }
@@ -71,27 +84,43 @@ class NormalJobCreate extends React.Component {
 
 
     componentDidMount(){
+        this.getJob()
     }
 
     render() {
+
         const { getFieldDecorator } = this.props.form;
-        const {languages, disciplines, regions, cities, additional_skills} = this.props.attributedatas || {}
+        const { regions,} = this.props.attributedatas || {}
+        let job = this.state.job
+
+        if ( this.state.loading_job) 
+            return (<Row className='job-card'>
+                <Col>
+                    <Card loading={this.state.loading_job} />
+                </Col>
+            </Row>)
         
+        if ( !job )
+            return (<Row className='job-card'>
+                    <Col>
+                        <Empty description={<span>No Job Found. Please come back later.</span>}/>
+                    </Col>
+                </Row>)
+
+
         return (
         <Row >
             
             <Col>
-
+                
+                
                 <div className='casting-login-wrapper'>
 
-
-                    <div className='login-area'>
-                    
-                        <div className='label h4'><Icon className='casting-icon' type="plus-square" /> CREATE JOB   </div>
+                    <div className='job-edit-area login-area'>
                         
+                            
+                        <div className='label h4'><Icon className='casting-icon' type="edit" /> UPDATE JOB Detail </div>
                         
-
-
                         <Form  className="login-form">
                     
                             <Row>
@@ -112,6 +141,7 @@ class NormalJobCreate extends React.Component {
                                 Job Title
                                 <Form.Item>
                                     {getFieldDecorator('title', {
+                                    initialValue : job.title,
                                     rules: [{ required: true, message: 'Please the job title!' }],
                                     })(
                                     <Input
@@ -129,6 +159,7 @@ class NormalJobCreate extends React.Component {
                                     
                                     <CKEditor
                                         editor={ ClassicEditor }
+                                        data={job.requirement}
                                         config={{
                                             toolbar: [ 'heading', '|', 'bold', 'italic', 'underline', 'link', 'bulletedList', 'numberedList', ],
                                         }}
@@ -141,7 +172,9 @@ class NormalJobCreate extends React.Component {
 
                                 Applicant Youngest Age
                                 <Form.Item>
+
                                     {getFieldDecorator('start_age', {
+                                    initialValue : job.start_age,
 
                                     })(
                                     <InputNumber
@@ -153,6 +186,7 @@ class NormalJobCreate extends React.Component {
                                 Applicant Oldest Age
                                 <Form.Item>
                                     {getFieldDecorator('end_age', {
+                                    initialValue : job.end_age,
 
                                     })(
                                     <InputNumber
@@ -165,6 +199,7 @@ class NormalJobCreate extends React.Component {
                                 Address
                                 <Form.Item>
                                     {getFieldDecorator('address', {
+                                    initialValue : job.address,
 
                                     rules: [{ required: true, message: 'Please input the adress of the job!' }],
                                     })(
@@ -178,6 +213,7 @@ class NormalJobCreate extends React.Component {
                                 Region
                                 <Form.Item>
                                     {getFieldDecorator('region', {
+                                    initialValue : job.region.id,
                                     
                                     rules: [{ required: true, message: 'Please select your region!' }],
                                     })(
@@ -198,6 +234,7 @@ class NormalJobCreate extends React.Component {
                                 Gender
                                 <Form.Item>
                                     {getFieldDecorator('gender', {
+                                    initialValue : job.gender,
                                     
                                     rules: [{ required: true, message: 'Please select job gender requirement!' }],
                                     })(
@@ -219,7 +256,8 @@ class NormalJobCreate extends React.Component {
                                 Payment
                                 <Form.Item>
                                     {getFieldDecorator('payment', {
-
+                                    initialValue : job.payment,
+                                    
                                     rules: [{ required: true, message: 'Please provide payment information!' }],
                                     })(
                                     <Input
@@ -232,6 +270,7 @@ class NormalJobCreate extends React.Component {
                                 Closes On
                                 <Form.Item>
                                     {getFieldDecorator('closes_on', {
+                                    initialValue : moment(job.closes_on),
                                     rules: [{ required: true, message: 'Please input job close date!' }],
                                     })(
                                     <DatePicker onChange={this.dateChange} format="YYYY-MM-DD" />,
@@ -241,8 +280,8 @@ class NormalJobCreate extends React.Component {
 
                                 <Form.Item>
                                     
-                                    <Button onClick={this.handleSubmit} size='large' block  loading={this.state.loading} type="primary" htmlType="submit" className="login-form-button">
-                                    Create Job <Icon className='casting-icon' type="save" />
+                                    <Button type="success" onClick={this.handleSubmit} size='large' block  loading={this.state.loading} type="primary" htmlType="submit" className="login-form-button">
+                                    Update Job <Icon className='casting-icon' type="save" />
                                     </Button>
                                 
                                 </Form.Item>
@@ -265,6 +304,6 @@ class NormalJobCreate extends React.Component {
 
 }
 
-const JobCreateForm = Form.create({ name: 'normal_basicinfo' })(NormalJobCreate);
+const JobEdit = Form.create({ name: 'normal_basicinfo' })(JobEditForm);
 
-export default JobCreateForm
+export default JobEdit

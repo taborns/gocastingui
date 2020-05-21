@@ -67,7 +67,7 @@ class NormalPasswordChangeForm extends React.Component {
 
                     <div className='login-area'>
                     
-                        <div className='label h3'>Password Information <Icon className='casting-icon' type="save" /> </div>
+                        <div className='label h3'>Password Information <Icon className='casting-icon' type="lock" /> </div>
 
                         
 

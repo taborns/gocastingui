@@ -22,6 +22,12 @@ export default class Root extends React.Component {
             jobs_current : 1,
 
 
+            searched_jobs : [],
+            searched_jobs_count : [],
+            searched_jobs_loading : true,
+            searched_jobs_current : 1,
+
+
             casts : [],
             casts_count : [],
             casts_loading : true,
@@ -69,6 +75,20 @@ export default class Root extends React.Component {
             prevstate.searchData[name] = value
             return prevstate.searchData
         })
+    }
+
+    jobSearch = (values, page) => {
+        
+        if ( !page )
+            page = 1
+
+        console.log("THEFUCK", "I am not", values)
+        Api.postData('search-jobs', values)
+        .then(
+            response => this.setState({ searched_jobs : response.results, searched_jobs_count : response.count, searched_jobs_loading : false, searched_jobs_current : page }), 
+            err => this.setState({ searched_jobs_loading : false})
+        )
+
     }
 
     paginateScroll = () => {
@@ -152,6 +172,7 @@ export default class Root extends React.Component {
                 <MainWrapper 
                     {...this.props} 
                     {...this.state}
+                    jobSearch={this.jobSearch}
                     getLoggedInUser = {this.getLoggedInUser}
                     setsearchGlobalState={this.setsearchGlobalState}
                     searchCasts={this.searchCasts}

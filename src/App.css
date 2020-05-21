@@ -96,6 +96,7 @@ body {
   padding: 10px 30px;
   -webkit-transition: all ease-in-out 0.4s;
   transition: all ease-in-out 0.4s;
+  text-transform: capitalize;
 }
 
 .model-name a {
@@ -422,3 +423,117 @@ ul.timeline {
   }
 }
 
+
+.job-card{
+  margin-bottom: 2px;
+}
+.ant-card-head-title {
+  white-space:pre-wrap !important;
+}
+
+.job-status-open,.job-status-close {
+  padding: 4px;
+  width: fit-content;
+  margin: 4px 0px;
+  color: white;
+  border-radius: 2px;
+  font-weight: bolder;
+}
+
+.job-status-open{
+  background: #37773a;
+}
+
+.job-status-close {
+  background: #a21211;
+}
+
+
+.job-attribute-title {
+  font-weight: bolder;
+}
+
+.job-view-more, .myjob-btn {
+  padding: 10px;
+  display: inline-block;
+  border-radius: 3px;
+  margin-left: 4px;
+
+}
+.myjob-btn {
+  color: #000000 !important;
+}
+.job-view-more {
+  background:  #dc412a;
+  color: #fff !important;
+
+}
+
+.myjob-btn:hover {
+  background: #dc412a;
+  color: white !important;
+}
+
+.myjob-btn-edit {
+  _border: solid 1px #0eaf0e;
+
+}
+.job-title {
+  color: #333;
+  font-size: 1.3em!important;
+  font-weight: 600;
+  padding-bottom: 5px;
+  text-transform: capitalize;
+}
+
+.job-meta-data {
+  padding: 5px;
+  border-bottom: 1px solid #001529;
+  margin-bottom: 12px;
+}
+
+
+.job-apply, .job-applied {
+  font-size: 20px !important;
+  padding: 15px 25px  !important;
+  color: #fff !important;
+  background: #dc412a !important;
+
+}
+
+.job-applied {
+  background: green !important;
+}
+
+.apply-now-wrapper {
+  margin-top: 35px;
+}
+
+.job-attributes {
+  margin: 10px 0;
+}
+
+.search-area {
+  background: whitesmoke;
+  padding: 20px 5px;
+}
+
+.single-job-header{
+  background: white !important;
+  padding: 4px !important;
+  border-bottom: solid 1px gray;
+}
+
+
+.wallet-area { 
+  background: white;
+  padding: 20px;
+}
+
+.wallet-area .wallet-balance {
+  background: green;
+  display: inline-block;
+  padding: 2px 5px;
+  color: white;
+  font-weight: bolder;
+}

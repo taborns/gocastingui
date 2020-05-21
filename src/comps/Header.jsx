@@ -18,6 +18,41 @@ import {
 import {Icon, Menu, Dropdown} from 'antd';
 import { Link } from 'react-router-dom';
 
+const agentMenu = (props) => (
+  <Menu>
+    <Menu.Item key="create-job">
+
+      <Link to='/create-job/'>
+        <Icon className='casting-icon' type="plus" /> Create Job
+      </Link>
+    </Menu.Item>
+
+     <Menu.Item key="jobs">
+      <Link to='/myjobs/'>
+        <Icon className='casting-icon' type="tags" /> My Jobs
+      </Link>
+    </Menu.Item>
+
+    <Menu.Divider/>
+
+    <Menu.Item key="2">
+    
+      <Link to='/settings/'>
+        <Icon className='casting-icon' type="setting" /> Settings
+      </Link>
+    </Menu.Item>
+        
+
+    <Menu.Item key="1">
+      
+      <Link onClick={()=>props.logout()}>
+        <Icon className='casting-icon' type="user" /> Logout
+      </Link>
+
+    </Menu.Item>
+
+  </Menu>
+)
 const menu = (props)=>(
   <Menu>
 
@@ -30,22 +65,24 @@ const menu = (props)=>(
 
     </Menu.Item>
 
-    {props.user && props.user.agent && 
-      <Menu.Item key="create-job">
-
-        <Link to='/create-job/'>
-          <Icon className='casting-icon' type="plus" /> Create Job
-        </Link>
-      </Menu.Item>
-      }
-
-    <Menu.Item key="2">
-    
+    <Menu.Item key="settings">
+      {props.user && props.user.cast && 
       <Link to='/settings/'>
         <Icon className='casting-icon' type="setting" /> Settings
       </Link>
+      }
+
     </Menu.Item>
 
+    <Menu.Item key="settings">
+      {props.user && props.user.cast && 
+      <Link to='/applications/'>
+        <Icon className='casting-icon' type="check-circle" /> Applications
+      </Link>
+      }
+
+    </Menu.Item>
+    
     <Menu.Divider/>
 
     <Menu.Item key="1">
@@ -64,6 +101,7 @@ const Header = (props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
+  const drop_down_menu = props.user && props.user.cast && menu(props) || props.user && props.user.agent && agentMenu(props)
 
   return (
     <div>
@@ -76,7 +114,7 @@ const Header = (props) => {
           {!props.user && 
             (<Nav className="mr-auto" navbar>
               <NavItem>
-                <Link className='header-link' to='/'><Icon className='casting-icon' type="contacts" /> Casts</Link>
+                <Link className='header-link' to='/'><Icon className='casting-icon' type="appstore" /> Casts</Link>
               </NavItem>
               
             <NavItem>
@@ -99,7 +137,7 @@ const Header = (props) => {
           <Nav className="mr-auto" navbar>
             
             <NavItem>
-              <Link className='header-link' to='/'><Icon className='casting-icon' type="contacts" /> Casts</Link>
+              <Link className='header-link' to='/'><Icon className='casting-icon' type="appstore" /> Casts</Link>
             </NavItem>
             <NavItem>
               <Link className='header-link' to='/jobs/'><Icon className='casting-icon' type="compass" /> JObs</Link>
@@ -112,7 +150,7 @@ const Header = (props) => {
           {props.user && 
           <NavItem style={{ listStyle : "none"}}>
 
-          <Dropdown placement="bottomLeft" overlay={menu(props)}>
+          <Dropdown placement="bottomLeft" overlay={drop_down_menu}>
             <Button className='casting-user-logged' color="danger">
             <Icon className='casting-icon' type='user'></Icon>{props.user.first_name} {props.user.last_name}  
             <Icon className='casting-icon' type='down'></Icon>
